@@ -3,6 +3,7 @@ import { ref, watch, onMounted, onBeforeUnmount, computed, reactive } from "vue"
 import { http } from "@/services/http";
 import CrudDialog from "./CrudDialog.vue";
 import DeleteChoiceDialog from "./DeleteChoiceDialog.vue";
+import ColumnSelector from "@/components/tables/ColumnSelector.vue";
 
 const props = defineProps<{
   apiPath: string;
@@ -13,9 +14,10 @@ const props = defineProps<{
   updateFn: (form: any) => Promise<any>;
   deleteFn: (id: any, row?: any) => Promise<any>;
   keyMap?: Record<string, string>;
-  // Added validateForm prop
   validateForm?: (form: any) => Promise<{ ok: boolean; message?: string }>;
+  storageKey?: string; 
 }>();
+
 
 const isSampleTable = computed(() => props.apiPath.includes("/samples"));
 
@@ -86,7 +88,21 @@ function showError(message: string) {
 onMounted(() => {
   recalcItemsPerPage();
   window.addEventListener("resize", recalcItemsPerPage);
+  
+  // Load saved columns from localStorage
+  if (props.storageKey) {
+    const saved = localStorage.getItem(props.storageKey);
+    if (saved) {
+      try {
+        visibleColumns.value = JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse saved columns', e);
+      }
+    }
+  }
 });
+
+
 onBeforeUnmount(() => {
   window.removeEventListener("resize", recalcItemsPerPage);
 });
@@ -365,12 +381,34 @@ async function performAdvancedDelete(action: "cascade" | "detach") {
 function askDelete(item: any) {
   confirm.value = { visible: true, target: item };
 }
-</script>
 
+const visibleColumns = ref<string[]>(
+  props.headers.map(h => h.key)
+);
+
+watch(visibleColumns, (newValue) => {
+  if (props.storageKey) {
+    localStorage.setItem(props.storageKey, JSON.stringify(newValue));
+  }
+}, { deep: true });
+
+const filteredHeaders = computed(() => {
+  return props.headers.filter(h => visibleColumns.value.includes(h.key));
+});
+
+</script>
 <template>
   <v-card flat>
+    <v-toolbar flat density="compact" color="transparent">
+      <v-spacer />
+      <ColumnSelector
+        :headers="props.headers"
+        v-model="visibleColumns"
+      />
+    </v-toolbar>
+
     <v-data-table-server
-        :headers="[...props.headers, { key: 'actions', title: 'Actions' }]"
+        :headers="[...filteredHeaders, { key: 'actions', title: 'Actions' }]"
         :items="rows"
         :items-length="total"
         :loading="loading"
@@ -385,7 +423,7 @@ function askDelete(item: any) {
       <!-- Filters -->
       <template #top>
         <v-row class="pa-2" align="center">
-          <v-col v-for="h in props.headers" :key="h.key" cols="12" sm="2">
+          <v-col v-for="h in filteredHeaders" :key="h.key" cols="12" sm="2">
             <v-text-field
                 :label="`Filter ${h.key}`"
                 v-model="filters[h.key]"
@@ -401,7 +439,7 @@ function askDelete(item: any) {
       <!-- Rows -->
       <template #item="{ item }">
         <tr>
-          <td v-for="h in props.headers" :key="h.key">{{ item[h.key] }}</td>
+          <td v-for="h in filteredHeaders" :key="h.key">{{ item[h.key] }}</td>
           <td class="text-right">
             <v-btn icon="mdi-pencil" size="small" color="primary" variant="text" @click="openEdit(item)" />
             <v-btn icon="mdi-delete" size="small" color="error" variant="text" @click="askDelete(item)" />
@@ -410,7 +448,7 @@ function askDelete(item: any) {
       </template>
     </v-data-table-server>
 
-    <!-- Create/Edit Dialog -->
+    <!-- Rest of your dialogs remain the same -->
     <CrudDialog
         v-model:visible="dialog.visible"
         :mode="dialog.mode"
@@ -421,7 +459,6 @@ function askDelete(item: any) {
         @cancel="dialog.visible = false"
     />
 
-    <!-- Delete Confirmation -->
     <v-dialog v-model="confirm.visible" width="420">
       <v-card class="pa-4" style="backdrop-filter: blur(10px);">
         <v-card-title>Delete item?</v-card-title>
@@ -443,7 +480,6 @@ function askDelete(item: any) {
         @choose="performAdvancedDelete"
     />
 
-    <!-- Error / Validation Dialog -->
     <v-dialog v-model="errorDialog.visible" max-width="400">
       <v-card>
         <v-card-title class="text-h5 text-error">
@@ -459,6 +495,5 @@ function askDelete(item: any) {
         </v-card-actions>
       </v-card>
     </v-dialog>
-
   </v-card>
 </template>

@@ -1,29 +1,41 @@
-import 'vuetify/styles';
-import { createVuetify } from 'vuetify';
+import 'vuetify/styles'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import { mdi } from 'vuetify/iconsets/mdi'
 
 export default createVuetify({
+  components,
+  directives,
+  icons: {
+    defaultSet: 'mdi',
+    sets: { mdi }
+  },
   theme: {
     defaultTheme: 'light',
     themes: {
       light: {
         colors: {
-          background: '#ffffff',
-          surface: '#ffffff',
-          primary: '#333333ff',  // near-black accents
-          secondary: '#6b7280', // gray-500
-          success: '#059669',
-          error: '#853838ff'
+          primary: '#1976D2',
+          secondary: '#424242',
+          accent: '#82B1FF',
+          error: '#FF5252',
+          info: '#2196F3',
+          success: '#4CAF50',
+          warning: '#FFC107',
         },
-        variables: {
-          'border-radius-root': '16px'
-        }
-      }
-    }
+      },
+      dark: {
+        colors: {
+          primary: '#2196F3',
+          secondary: '#424242',
+          accent: '#FF4081',
+          error: '#FF5252',
+          info: '#2196F3',
+          success: '#4CAF50',
+          warning: '#FB8C00',
+        },
+      },
+    },
   },
-  defaults: {
-    VCard: { elevation: 1, rounded: 'xl' },
-    VBtn: { rounded: 'xl' },
-    VTextField: { density: 'compact', variant: 'outlined' },
-    VDataTable: { density: 'comfortable' }
-  }
-});
+})

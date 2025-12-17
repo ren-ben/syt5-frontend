@@ -31,7 +31,7 @@ async function generateSampleId(): Promise<string> {
     const result = await fetchSamples(0, 1, {}, { s_id: 'desc' });
 
     if (result.content && result.content.length > 0) {
-      const latestId = result.content[0].s_id ?? result.content[0].sId;
+      const latestId = result.content[0].s_id ?? result.content[0].s_id;
 
       if (latestId && latestId.startsWith(base)) {
         const lastDigit = parseInt(latestId.charAt(12), 10);
@@ -115,6 +115,7 @@ async function validateForm(form: any) {
         api-path="/samples"
         :headers="headers"
         default-sort="s_stamp"
+        storage-key="sample-table-columns"
         :createFn="createSample"
         :updateFn="updateSample"
         :deleteFn="handleDelete"
@@ -123,3 +124,4 @@ async function validateForm(form: any) {
     />
   </v-container>
 </template>
+

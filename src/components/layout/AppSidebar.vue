@@ -64,8 +64,6 @@ const form = ref<Record<string, any>>({});
 // Dynamische Felder vom Store (du machst das später schön)
 const fields = computed(() => store.getFieldsForActive()); // <--- DU fügst diese Funktion in Store ein
 
-
-
 function closeDialog() {
   showDialog.value = false;
 }
@@ -74,19 +72,26 @@ async function handleSave(localForm) {
   await createSample(localForm);
   closeDialog();
 }
-
-
 </script>
 
 <style scoped>
-.v-navigation-drawer {
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+/* Dark mode styles */
+.v-theme--dark .v-navigation-drawer {
   background-color: #121212 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+/* Light mode styles */
+.v-theme--light .v-navigation-drawer {
+  background-color: #ffffff !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
 .sidebar-create-btn {
   backdrop-filter: blur(8px);
   transition: all 0.25s ease;
 }
+
 .sidebar-create-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 0 12px rgba(100, 181, 246, 0.6);

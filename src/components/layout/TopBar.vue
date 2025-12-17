@@ -27,13 +27,30 @@
       >
         OpenAPI
       </v-btn>
+      
+      <!-- Theme Toggle Button -->
+      <v-btn
+        :icon="theme.global.current.value.dark ? 'mdi-weather-night' : 'mdi-weather-sunny'"
+        @click="toggleTheme"
+        variant="text"
+        size="small"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useTheme } from 'vuetify'
+
 const model = ref("");
+const theme = useTheme()
+
+const toggleTheme = () => {
+  theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+  // Persist theme preference
+  localStorage.setItem('theme', theme.global.name.value)
+}
 </script>
 
 <style scoped>
@@ -53,5 +70,6 @@ const model = ref("");
 .links {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 </style>
