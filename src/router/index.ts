@@ -3,6 +3,7 @@ import TableWrapper from '@/components/tables/TableWrapper.vue';
 import LoginView from '@/views/LoginView.vue';
 import ApprovalsView from '@/views/ApprovalsView.vue'; // Make sure you created this file!
 import { useAuthStore } from '@/stores/auth';
+import ReportsView from '../views/ReportsView.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -27,6 +28,12 @@ const router = createRouter({
       name: 'approvals',
       component: ApprovalsView,
       meta: { requiresAdmin: true }
+    },
+    {
+      path: '/reports',
+      name: 'reports',
+      component: ReportsView,
+      meta: { requiresAuth: true }
     }
   ]
 });

@@ -12,13 +12,14 @@
     />
 
     <div class="links">
+
       <v-btn
-        variant="tonal"
         size="small"
-        @click="$router.push(`/table/sample`)"
+        @click="$router.push('/reports')"
       >
-        Sample
+        Reports
       </v-btn>
+
       <v-btn
         variant="text"
         size="small"
@@ -36,7 +37,6 @@
         size="small"
       />
 
-      <!-- Logout Button (ADDED) -->
       <v-btn
         color="error"
         variant="text"
@@ -49,6 +49,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref } from "vue";
