@@ -18,11 +18,34 @@
         active-class="bg-primary text-white"
         @click="set(t)"
       />
+
+      <!-- ADMIN SECTION -->
+      <div v-if="authStore.isAdmin">
+        <v-divider class="my-3"></v-divider>
+        <!-- UPDATED: removed text-error, uses default theme color -->
+        <v-list-subheader class="text-uppercase text-subtitle-2 mb-2">
+          Admin
+        </v-list-subheader>
+        
+        <!-- UPDATED: active-class is now primary (blue) -->
+        <v-list-item
+          to="/admin/approvals"
+          prepend-icon="mdi-account-check"
+          title="Approvals"
+          class="mb-1 rounded-lg"
+          active-class="bg-primary text-white"
+        >
+          <template v-slot:append>
+             <v-badge v-if="pendingCount > 0" :content="pendingCount" color="error" inline />
+          </template>
+        </v-list-item>
+      </div>
     </v-list>
 
     <v-spacer />
 
-    <div class="d-flex justify-center pa-3 mt-auto">
+    <!-- UPDATED: Button hidden on approvals page -->
+    <div v-if="!isApprovalsPage" class="d-flex justify-center pa-3 mt-auto">
       <v-btn
         icon="mdi-plus"
         color="primary"
@@ -46,23 +69,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
 import { useTablesStore } from "@/stores/tables.store";
+import { useAuthStore } from "@/stores/auth";
+import { useRoute } from 'vue-router'; // Import useRoute
 import CrudDialog from "@/components/crud/CrudDialog.vue";
-
-import { createSample } from "@/services/tables/sample.service"; // später pro Tabelle anders
+import { createSample } from "@/services/tables/sample.service"; 
+import { http } from '@/services/http'; 
 
 const store = useTablesStore();
+const authStore = useAuthStore();
+const route = useRoute(); // Initialize route
+
 const tables = store.tables;
 const set = (t: string) => store.setActive(t);
+
+// Check if current page is approvals
+const isApprovalsPage = computed(() => route.path === '/admin/approvals');
+
+// Badge State
+const pendingCount = ref(0);
 
 // Dialog State
 const showDialog = ref(false);
 const mode = ref<"create" | "edit">("create");
 const form = ref<Record<string, any>>({});
 
-// Dynamische Felder vom Store (du machst das später schön)
-const fields = computed(() => store.getFieldsForActive()); // <--- DU fügst diese Funktion in Store ein
+// Dynamische Felder vom Store
+const fields = computed(() => store.getFieldsForActive()); 
 
 function closeDialog() {
   showDialog.value = false;
@@ -72,6 +106,18 @@ async function handleSave(localForm) {
   await createSample(localForm);
   closeDialog();
 }
+
+// Fetch pending count on mount if admin
+onMounted(async () => {
+  if (authStore.isAdmin) {
+    try {
+      const res = await http.get('/admin/pending-users/count');
+      pendingCount.value = res.data.count;
+    } catch (e) {
+      console.warn('Failed to fetch pending count', e);
+    }
+  }
+});
 </script>
 
 <style scoped>

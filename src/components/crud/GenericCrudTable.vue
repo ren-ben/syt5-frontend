@@ -195,7 +195,7 @@ async function load() {
     }
 
     rows.value = (data.content ?? []).map(normalizeRow);
-    total.value = data.totalElements ?? 0;
+    total.value = data.total_elements ?? data.totalElements ?? 0;
 
   } catch (err) {
     console.error("Load failed:", err);
@@ -497,3 +497,30 @@ const filteredHeaders = computed(() => {
     </v-dialog>
   </v-card>
 </template>
+
+<style scoped>
+/* 1. Force the table container to have the surface background */
+:deep(.v-table),
+:deep(.v-table__wrapper) {
+  background-color: rgb(var(--v-theme-surface)) !important;
+}
+
+/* 2. Force every row and cell to be opaque surface color */
+:deep(.v-data-table__tr),
+:deep(.v-data-table__td) {
+  background-color: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+/* 3. Handle the sticky header specifically */
+:deep(.v-data-table-header__content),
+:deep(.v-data-table__th) {
+  background-color: rgb(var(--v-theme-surface)) !important;
+  z-index: 10 !important; /* Ensure it stays on top */
+}
+
+/* 4. Fix for hover state (optional, keeps it dark on hover) */
+:deep(.v-data-table__tr:hover > td) {
+  background-color: rgba(var(--v-theme-on-surface), 0.08) !important;
+}
+</style>

@@ -82,6 +82,16 @@
         </v-card>
       </v-col>
     </v-row>
+
+      <v-snackbar v-model="successSnackbar" color="success" timeout="5000">
+        <div class="d-flex align-center">
+            <v-icon icon="mdi-check-circle" class="mr-2"></v-icon>
+            {{ successMessage }}
+            </div>
+            <template v-slot:actions>
+            <v-btn variant="text" @click="successSnackbar = false">Close</v-btn>
+        </template>
+     </v-snackbar>
     
     <v-snackbar v-model="errorSnackbar" color="error">
       {{ errorMessage }}
@@ -95,6 +105,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+
+const successSnackbar = ref(false);
+const successMessage = ref('');
 
 const authStore = useAuthStore();
 const tab = ref('login');
@@ -122,6 +135,14 @@ const handleRegister = async () => {
   loading.value = true;
   try {
     await authStore.register(registerForm.value);
+    
+    successMessage.value = "Registration sent! Please wait for admin approval.";
+    successSnackbar.value = true;
+    
+    tab.value = 'login';
+    
+    registerForm.value = { username: '', email: '', password: '' };
+    
   } catch (e: any) {
     errorMessage.value = "Registration failed.";
     errorSnackbar.value = true;

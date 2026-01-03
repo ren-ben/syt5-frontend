@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import TableWrapper from '@/components/tables/TableWrapper.vue';
-import LoginView from '@/views/LoginView.vue'; // <--- Import this
-import { useAuthStore } from '@/stores/auth'; // <--- Import store
+import LoginView from '@/views/LoginView.vue';
+import ApprovalsView from '@/views/ApprovalsView.vue'; // Make sure you created this file!
+import { useAuthStore } from '@/stores/auth';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -20,7 +21,12 @@ const router = createRouter({
       path: '/table/:name', 
       name: 'table', 
       component: TableWrapper 
-      // Implicitly protected because it lacks meta.public
+    },
+    {
+      path: '/admin/approvals',
+      name: 'approvals',
+      component: ApprovalsView,
+      meta: { requiresAdmin: true }
     }
   ]
 });
@@ -38,6 +44,12 @@ router.beforeEach((to, from, next) => {
   // 2. If logged in AND trying to access Login
   if (to.meta.public && isAuthenticated) {
     return next('/'); // Redirect to default home
+  }
+
+  // 3. Admin Check
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    // If user tries to access admin route but isn't admin
+    return next('/'); 
   }
 
   next();
