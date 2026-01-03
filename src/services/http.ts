@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '@/stores/auth';
 
 export const http = axios.create({
   baseURL: '/api',
@@ -27,16 +28,31 @@ http.interceptors.request.use(
   }
 );
 
-// UPDATED - Response interceptor with better error logging
+http.interceptors.request.use(config => {
+  const authStore = useAuthStore();
+  if (authStore.token) {
+    config.headers.Authorization = `Bearer ${authStore.token}`;
+  }
+  return config;
+});
+
 http.interceptors.response.use(
   r => r,
   err => {
     const status = err?.response?.status;
     const message = err?.message;
     
-    if (status === 403) {
-      console.error('[HTTP] 403 Forbidden - CSRF validation failed or access denied');
-    } else {
+    // JWT Logic: 401 means "Who are you?" (Invalid Token)
+    if (status === 401) {
+      console.warn('[HTTP] 401 Unauthorized - Logging out...');
+      const authStore = useAuthStore();
+      authStore.logout(); // Force logout
+    } 
+    // JWT Logic: 403 means "You are known, but not allowed" (Role issue)
+    else if (status === 403) {
+      console.error('[HTTP] 403 Forbidden - Insufficient permissions');
+    } 
+    else {
       console.error('[HTTP]', status, message);
     }
     

@@ -35,22 +35,42 @@
         variant="text"
         size="small"
       />
+
+      <!-- Logout Button (ADDED) -->
+      <v-btn
+        color="error"
+        variant="text"
+        size="small"
+        prepend-icon="mdi-logout"
+        @click="handleLogout"
+      >
+        Logout
+      </v-btn>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useTheme } from 'vuetify'
+import { useTheme } from 'vuetify';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 const model = ref("");
-const theme = useTheme()
+const theme = useTheme();
+const router = useRouter();
+const authStore = useAuthStore();
 
 const toggleTheme = () => {
-  theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+  theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark';
   // Persist theme preference
-  localStorage.setItem('theme', theme.global.name.value)
-}
+  localStorage.setItem('theme', theme.global.name.value);
+};
+
+const handleLogout = () => {
+  authStore.logout();
+  router.push('/login');
+};
 </script>
 
 <style scoped>
