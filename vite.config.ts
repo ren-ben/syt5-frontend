@@ -1,12 +1,12 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
-import vuetify from 'vite-plugin-vuetify'
-import { VitePWA } from 'vite-plugin-pwa'
+import vuetify from 'vite-plugin-vuetify';
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   plugins: [
-    vue(), 
+    vue(),
     vuetify({ autoImport: true }),
     VitePWA({
       registerType: 'autoUpdate',
@@ -35,13 +35,18 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^http:\/\/localhost:8040\/api\/.*/i,
+            // FIXED: Matches any request starting with /api (relative path)
+            // This works for both localhost:8040 AND venlab.net/api
+            urlPattern: ({ url }) => url.pathname.startsWith('/api'),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
               }
             }
           }
@@ -54,6 +59,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // This proxy only works for 'npm run dev' on your laptop
   server: {
     proxy: {
       '/api': {
