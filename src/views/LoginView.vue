@@ -1,41 +1,68 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
-// import { useAuthStore } from '@/stores/auth'; // UNCOMMENT THIS
+import { useAuthStore } from '@/stores/auth'; // INTEGRATED
 
 const router = useRouter();
-// const authStore = useAuthStore(); // UNCOMMENT THIS
+const authStore = useAuthStore(); // INTEGRATED
 
-const isLogin = ref(true);
+// --- STATE ---
+const isLogin = ref(true); // Toggle between Login and Register
 const isLoading = ref(false);
+
+// --- SNACKBARS (Added back) ---
+const successSnackbar = ref(false);
+const successMessage = ref('');
+const errorSnackbar = ref(false);
 const errorMessage = ref('');
 
+// --- FORM DATA ---
 const form = reactive({
   username: '',
-  email: '',
+  email: '', 
   password: ''
 });
+const rememberMe = ref(false); // Added for login
 
 const toggleMode = () => {
   isLogin.value = !isLogin.value;
-  errorMessage.value = '';
+  errorMessage.value = ''; 
+  // Optional: Reset form on toggle
+  // form.username = ''; form.email = ''; form.password = '';
 };
 
+// --- ACTIONS ---
 const handleSubmit = async () => {
   isLoading.value = true;
   errorMessage.value = '';
+  errorSnackbar.value = false;
 
   try {
     if (isLogin.value) {
-      console.log('Logging in with:', form.username, form.password);
-      // await authStore.login(form);
-      // router.push('/dashboard');
+      // --- LOGIN LOGIC ---
+      console.log('Logging in with:', form.username);
+      // Pass username/password/rememberMe to store
+      await authStore.login({ username: form.username, password: form.password }, rememberMe.value);
+      
+      // Router redirect is usually handled inside store or here
+      // router.push('/dashboard'); 
     } else {
+      // --- REGISTER LOGIC ---
       console.log('Registering with:', form);
-      // await authStore.register(form);
+      await authStore.register({ username: form.username, email: form.email, password: form.password });
+      
+      // Success handling
+      successMessage.value = "Registration sent! Please wait for admin approval.";
+      successSnackbar.value = true;
+      
+      // Switch back to login
+      isLogin.value = true;
+      form.password = ''; // Clear password
     }
   } catch (error: any) {
-    errorMessage.value = error.response?.data?.message || 'Authentication failed';
+    console.error(error);
+    errorMessage.value = error.response?.data?.message || (isLogin.value ? 'Login failed' : 'Registration failed');
+    errorSnackbar.value = true;
   } finally {
     isLoading.value = false;
   }
@@ -70,6 +97,7 @@ const handleSubmit = async () => {
       <!-- FORM -->
       <form @submit.prevent="handleSubmit" class="auth-form">
         
+        <!-- Inline Error (Optional, duplicate of snackbar but good for UI) -->
         <div v-if="errorMessage" class="error-alert">
           {{ errorMessage }}
         </div>
@@ -85,6 +113,7 @@ const handleSubmit = async () => {
           />
         </div>
 
+        <!-- Email (Register Only) -->
         <div v-if="!isLogin" class="form-group slide-in">
           <label for="email">Email</label>
           <input 
@@ -107,6 +136,15 @@ const handleSubmit = async () => {
           />
         </div>
 
+        <!-- Remember Me (Login Only) -->
+        <div v-if="isLogin" class="form-group-checkbox slide-in">
+          <label class="checkbox-container">
+            <input type="checkbox" v-model="rememberMe">
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Remember me</span>
+          </label>
+        </div>
+
         <button type="submit" class="submit-btn" :disabled="isLoading">
           <span v-if="isLoading">Processing...</span>
           <span v-else>{{ isLogin ? 'Sign In' : 'Create Account' }}</span>
@@ -119,22 +157,38 @@ const handleSubmit = async () => {
       </div>
 
     </div>
+
+    <!-- SNACKBARS (Hidden functionality, visible UI overlay) -->
+    <!-- Note: We are using a simple CSS implementation for snackbars to match the style 
+         instead of depending on V-Snackbar inside this raw CSS layout, 
+         BUT since you have Vuetify installed, we can wrap the whole thing or just use fixed positioning -->
+    
+    <div v-if="successSnackbar" class="custom-snackbar success">
+        <span>{{ successMessage }}</span>
+        <button @click="successSnackbar = false">✕</button>
+    </div>
+
+    <div v-if="errorSnackbar" class="custom-snackbar error">
+        <span>{{ errorMessage }}</span>
+        <button @click="errorSnackbar = false">✕</button>
+    </div>
+
   </div>
 </template>
 
 <style scoped>
 /* --- REFINED DARK THEME VARIABLES --- */
 :root {
-  --primary: #2196F3;         /* Vuetify Blue */
-  --primary-hover: #1E88E5;   /* Slightly Darker Blue */
-  --bg-page: #000000;         /* Pitch Black Page Background */
-  --card-bg: #1E1E1E;         /* Dark Grey Card */
-  --text-main: #FFFFFF;       /* Pure White Text */
-  --text-muted: #9E9E9E;      /* Medium Grey Text */
-  --input-bg: #2D2D2D;        /* Lighter Grey for Inputs */
-  --input-border: #424242;    /* Subtle Border */
-  --tab-bg: #121212;          /* Black Tab Bar */
-  --tab-inactive: #757575;    /* Inactive Tab Text */
+  --primary: #2196F3;
+  --primary-hover: #1E88E5;
+  --bg-page: #000000;
+  --card-bg: #1E1E1E;
+  --text-main: #FFFFFF;
+  --text-muted: #9E9E9E;
+  --input-bg: #2D2D2D;
+  --input-border: #424242;
+  --tab-bg: #121212;
+  --tab-inactive: #757575;
 }
 
 /* --- LAYOUT --- */
@@ -143,11 +197,11 @@ const handleSubmit = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Subtle gradient to add depth */
   background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
   font-family: 'Roboto', sans-serif;
   padding: 1rem;
   color: var(--text-main);
+  position: relative; /* For snackbars */
 }
 
 .auth-card {
@@ -156,7 +210,6 @@ const handleSubmit = async () => {
   max-width: 400px;
   padding: 2.5rem;
   border-radius: 12px;
-  /* Strong shadow to lift card off background */
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
   border: 1px solid #333;
 }
@@ -172,7 +225,6 @@ const handleSubmit = async () => {
   width: auto;
   margin-bottom: 1rem;
   object-fit: contain;
-  /* White Glow Effect */
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.15));
 }
 
@@ -215,9 +267,8 @@ const handleSubmit = async () => {
 }
 
 .auth-tabs button.active {
-  background: #333; /* Dark Grey Active State (Subtle) or use Primary */
   color: white;
-  background: var(--primary); /* OPTION: Use Primary color for active tab */
+  background: var(--primary);
 }
 
 /* --- FORM --- */
@@ -236,11 +287,13 @@ const handleSubmit = async () => {
 label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #E0E0E0; /* Lighter than muted for readability */
+  color: #E0E0E0;
   margin-left: 2px;
 }
 
-input {
+input[type="text"],
+input[type="password"],
+input[type="email"] {
   padding: 0.9rem 1rem;
   background-color: var(--input-bg);
   border: 1px solid var(--input-border);
@@ -249,16 +302,14 @@ input {
   color: white;
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
+  width: 100%;
 }
 
-input::placeholder {
-  color: #666;
-  font-weight: 400;
-}
+input::placeholder { color: #666; font-weight: 400; }
 
 input:focus {
   border-color: var(--primary);
-  background-color: #333; /* Slightly lighter on focus */
+  background-color: #333;
   box-shadow: 0 0 0 1px var(--primary);
 }
 
@@ -289,6 +340,51 @@ input:focus {
   box-shadow: none;
 }
 
+/* --- CHECKBOX (Custom) --- */
+.form-group-checkbox {
+  display: flex;
+  align-items: center;
+}
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.checkbox-container input {
+  display: none;
+}
+.checkmark {
+  width: 18px;
+  height: 18px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  margin-right: 8px;
+  position: relative;
+  transition: all 0.2s;
+}
+.checkbox-container input:checked ~ .checkmark {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
 /* --- FOOTER --- */
 .auth-footer {
   text-align: center;
@@ -309,6 +405,7 @@ input:focus {
   color: var(--primary);
 }
 
+/* --- ALERTS & SNACKBARS --- */
 .error-alert {
   background-color: rgba(211, 47, 47, 0.2);
   color: #FF5252;
@@ -318,6 +415,42 @@ input:focus {
   text-align: center;
   border: 1px solid rgba(211, 47, 47, 0.5);
   margin-bottom: 0.5rem;
+}
+
+.custom-snackbar {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 1000;
+    font-size: 0.9rem;
+    min-width: 300px;
+    justify-content: space-between;
+    animation: slideDown 0.3s ease-out;
+}
+
+.custom-snackbar.success {
+    background-color: #4CAF50; /* Green */
+}
+
+.custom-snackbar.error {
+    background-color: #FF5252; /* Red */
+}
+
+.custom-snackbar button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.8;
 }
 
 /* --- ANIMATION --- */
