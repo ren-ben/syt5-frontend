@@ -53,7 +53,7 @@ describe('box', () => {
     cy.get('#password').type('admin123');
     cy.get('#app button.submit-btn').click();
     cy.get('#app a[href="/table/box"] div.v-list-item-title').click();
-    
+
     cy.get('#app th.v-data-table__th--sorted span').click();
     cy.get('#input-v-99').click();
     cy.get('#input-v-96').click();
