@@ -5,9 +5,9 @@
     "passes": 0,
     "pending": 0,
     "failures": 2,
-    "start": "2026-01-14T18:01:00.223Z",
-    "end": "2026-01-14T18:01:15.433Z",
-    "duration": 15210,
+    "start": "2026-01-14T20:57:47.639Z",
+    "end": "2026-01-14T20:58:02.191Z",
+    "duration": 14552,
     "testsRegistered": 2,
     "passPercent": 0,
     "pendingPercent": 0,
@@ -18,7 +18,7 @@
   },
   "results": [
     {
-      "uuid": "e37d6c84-ed1b-4b70-acbe-9626372492ae",
+      "uuid": "49c94af2-3685-483c-8173-0470bde898df",
       "title": "",
       "fullFile": "cypress\\e2e\\analysis.cy.ts",
       "file": "cypress\\e2e\\analysis.cy.ts",
@@ -27,7 +27,7 @@
       "tests": [],
       "suites": [
         {
-          "uuid": "7ec87d6d-0aec-4331-b86a-2b578691b082",
+          "uuid": "64944e44-8022-4ba2-8333-4c3f67ec643f",
           "title": "template spec",
           "fullFile": "",
           "file": "",
@@ -38,21 +38,21 @@
               "title": "create and delete",
               "fullTitle": "template spec create and delete",
               "timedOut": null,
-              "duration": 7749,
+              "duration": 5136,
               "state": "failed",
               "speed": null,
               "pass": false,
               "fail": true,
               "pending": false,
               "context": null,
-              "code": "cy.visit('http://localhost:5173/table/analysis');\ncy.get('#username').click();\ncy.get('#username').type('admin');\ncy.get('#password').click();\ncy.get('#password').type('admin123');\ncy.get('#app button.submit-btn').click();\ncy.get('#app a[href=\"/table/analysis\"]').click();\n// CREATE ACTION\ncy.get('#app button.bg-primary').click();\ncy.get('[data-cy=\"crud-sId\"]').click();\ncy.get('[data-cy=\"crud-sId\"]').type('879ed661-1393');\ncy.get('[data-cy=\"crud-sStamp\"]').click();\ncy.get('[data-cy=\"crud-sStamp\"]').type('2026-01-03T22:48:46');\ncy.get('[data-cy=\"crud-comment\"]').click();\ncy.get('[data-cy=\"crud-comment\"]').type('1e2e');\ncy.get('button.v-btn--variant-flat span.v-btn__content').click();\n// --- DB CHECK: VERIFY CREATE ---\ncy.task('queryDB', \"SELECT * FROM venlab.analysis WHERE comment = '1e2e'\").then(function (rows) {\n    expect(rows).to.have.length(1);\n});\n// DELETE ACTION\ncy.get('[data-cy=\"filter-comment\"]').click();\ncy.get('[data-cy=\"filter-comment\"]').type('1e2e');\ncy.get('#app tr:nth-child(1) button.text-error').click();\ncy.get('button.bg-error').click();\n// --- DB CHECK: VERIFY DELETE ---\ncy.task('queryDB', \"SELECT * FROM venlab.analysis WHERE comment = '1e2e'\").then(function (rows) {\n    expect(rows).to.have.length(0);\n});",
+              "code": "var comment = \"e2e_\".concat(Date.now());\nloginAndOpenAnalysis();\n// CREATE ACTION (analysis)\ncy.get('#app button.bg-primary').click();\ncy.get('.v-dialog', { timeout: 20000 }).should('be.visible');\ncy.get('[data-cy=\"crud-sId\"]', { timeout: 20000 }).should('be.visible').type('879ed661-1393');\ncy.get('[data-cy=\"crud-sStamp\"]').type('2026-01-03T22:48:46');\ncy.get('[data-cy=\"crud-comment\"]').type(comment);\ncy.intercept('POST', '**/api/**').as('createReq');\ncy.contains('button', 'Create').click({ force: true }); // more stable than deep selector\ncy.wait('@createReq').its('response.statusCode').should('be.oneOf', [200, 201]);\ncy.task('queryDB', \"SELECT * FROM venlab.analysis WHERE comment = '\".concat(comment, \"'\"))\n    .then(function (rows) { return expect(rows).to.have.length(1); });\n// DELETE\ncy.get('[data-cy=\"filter-comment\"]').clear().type(comment);\n// intercept BEFORE confirm click\ncy.intercept('DELETE', '**/api/**').as('deleteReq');\ncy.get('#app tr:nth-child(1) button.text-error').scrollIntoView().click({ force: true });\ncy.contains('button', 'Delete').click({ force: true });\ncy.wait('@deleteReq').its('response.statusCode').should('be.oneOf', [200, 204]);\ncy.task('queryDB', \"SELECT * FROM venlab.analysis WHERE comment = '\".concat(comment, \"'\"))\n    .then(function (rows) { return expect(rows).to.have.length(0); });",
               "err": {
-                "message": "AssertionError: Timed out retrying after 6000ms: Expected to find element: `#app a[href=\"/table/analysis\"]`, but never found it.",
-                "estack": "AssertionError: Timed out retrying after 6000ms: Expected to find element: `#app a[href=\"/table/analysis\"]`, but never found it.\n    at Context.eval (webpack://frontend/./cypress/e2e/analysis.cy.ts:9:7)",
+                "message": "CypressError: `cy.task('queryDB')` failed with the following error:\n\n> password authentication failed for user \"postgres\"\n\nhttps://on.cypress.io/api/task",
+                "estack": "CypressError: `cy.task('queryDB')` failed with the following error:\n\n> password authentication failed for user \"postgres\"\n\nhttps://on.cypress.io/api/task\n    at <unknown> (http://localhost:5173/__cypress/runner/cypress_runner.js:138196:70)\n    at tryCatcher (http://localhost:5173/__cypress/runner/cypress_runner.js:1777:23)\n    at Promise._settlePromiseFromHandler (http://localhost:5173/__cypress/runner/cypress_runner.js:1489:31)\n    at Promise._settlePromise (http://localhost:5173/__cypress/runner/cypress_runner.js:1546:18)\n    at Promise._settlePromise0 (http://localhost:5173/__cypress/runner/cypress_runner.js:1591:10)\n    at Promise._settlePromises (http://localhost:5173/__cypress/runner/cypress_runner.js:1667:18)\n    at _drainQueueStep (http://localhost:5173/__cypress/runner/cypress_runner.js:2377:12)\n    at _drainQueue (http://localhost:5173/__cypress/runner/cypress_runner.js:2370:9)\n    at Async._drainQueues (http://localhost:5173/__cypress/runner/cypress_runner.js:2386:5)\n    at Async.drainQueues (http://localhost:5173/__cypress/runner/cypress_runner.js:2256:14)\n\nFrom Node.js Internals:\n  error: password authentication failed for user \"postgres\"\n      at Parser.parseErrorMessage (C:\\Users\\OliGa\\Documents\\code\\insy5-ci-cd-workflow-OPrzewlocki-MSimov\\frontend\\node_modules\\pg-protocol\\src\\parser.ts:369:69)\n      at Parser.handlePacket (C:\\Users\\OliGa\\Documents\\code\\insy5-ci-cd-workflow-OPrzewlocki-MSimov\\frontend\\node_modules\\pg-protocol\\src\\parser.ts:187:21)\n      at Parser.parse (C:\\Users\\OliGa\\Documents\\code\\insy5-ci-cd-workflow-OPrzewlocki-MSimov\\frontend\\node_modules\\pg-protocol\\src\\parser.ts:102:30)\n      at Socket.<anonymous> (C:\\Users\\OliGa\\Documents\\code\\insy5-ci-cd-workflow-OPrzewlocki-MSimov\\frontend\\node_modules\\pg-protocol\\src\\index.ts:7:48)\n      at Socket.emit (node:events:519:28)\n      at addChunk (node:internal/streams/readable:559:12)\n      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)\n      at Readable.push (node:internal/streams/readable:390:5)\n      at TCP.onStreamRead (node:internal/stream_base_commons:191:23)",
                 "diff": null
               },
-              "uuid": "aa2b9b82-6497-44e2-8fa9-46d090219584",
-              "parentUUID": "7ec87d6d-0aec-4331-b86a-2b578691b082",
+              "uuid": "c7c00e7f-c9c2-45ce-8533-d04daa65ac0a",
+              "parentUUID": "64944e44-8022-4ba2-8333-4c3f67ec643f",
               "isHook": false,
               "skipped": false
             },
@@ -60,21 +60,21 @@
               "title": "edit",
               "fullTitle": "template spec edit",
               "timedOut": null,
-              "duration": 7354,
+              "duration": 9365,
               "state": "failed",
               "speed": null,
               "pass": false,
               "fail": true,
               "pending": false,
               "context": null,
-              "code": "cy.visit('http://localhost:5173/table/analysis');\ncy.get('#username').click();\ncy.get('#username').type('admin');\ncy.get('#password').click();\ncy.get('#password').type('admin123');\ncy.get('#app button.submit-btn').click();\ncy.get('#app a[href=\"/table/analysis\"]').click();\ncy.get('#app button.bg-primary').click();\ncy.get('[data-cy=\"crud-sId\"]').click();\ncy.get('[data-cy=\"crud-sId\"]').type('879ed661-1393');\ncy.get('[data-cy=\"crud-sStamp\"]').click();\ncy.get('[data-cy=\"crud-sStamp\"]').type('2026-01-03T22:48:46');\ncy.get('[data-cy=\"crud-comment\"]').click();\ncy.get('[data-cy=\"crud-comment\"]').type('test123');\ncy.get('button.v-btn--variant-flat span.v-btn__content').click();\n// FIRST EDIT\ncy.get('[data-cy=\"filter-comment\"]').click();\ncy.get('[data-cy=\"filter-comment\"]').type('test123');\ncy.get('#app tr:nth-child(1) button.text-primary span.v-btn__content i.mdi').click();\ncy.get('[data-cy=\"crud-comment\"]').click();\ncy.get('[data-cy=\"crud-comment\"]').clear();\ncy.get('[data-cy=\"crud-comment\"]').type('test123');\ncy.get('button.v-btn--variant-flat span.v-btn__content').click();\n// --- DB CHECK: VERIFY FIRST EDIT ---\ncy.task('queryDB', \"SELECT * FROM venlab.analysis WHERE comment = 'test123test123'\").then(function (rows) {\n    expect(rows.length).to.be.greaterThan(0);\n});\n// SECOND EDIT\ncy.get('#app i.mdi-pencil').click();\ncy.get('[data-cy=\"crud-comment\"]').click();\ncy.get('[data-cy=\"crud-comment\"]').clear();\ncy.get('[data-cy=\"crud-comment\"]').type('test123');\ncy.get('button.v-btn--variant-flat span.v-btn__content').click();\n// --- DB CHECK: VERIFY SECOND EDIT ---\ncy.task('queryDB', \"SELECT * FROM venlab.analysis WHERE comment = 'test123test123test123'\").then(function (rows) {\n    expect(rows.length).to.be.greaterThan(0);\n});\ncy.get('[data-cy=\"filter-comment\"]').click();\ncy.get('[data-cy=\"filter-comment\"]').type('test123test123test123');\ncy.get('#app tr:nth-child(1) button.text-error').click();\ncy.get('button.bg-error').click();",
+              "code": "var comment = \"edit_\".concat(Date.now());\nloginAndOpenAnalysis();\n// create row to edit\ncy.get('#app button.bg-primary').click();\ncy.get('.v-dialog', { timeout: 20000 }).should('be.visible');\ncy.get('[data-cy=\"crud-sId\"]').type('879ed661-1393');\ncy.get('[data-cy=\"crud-sStamp\"]').type('2026-01-03T22:48:46');\ncy.get('[data-cy=\"crud-comment\"]').type(comment);\ncy.intercept('POST', '**/api/**').as('createReq');\ncy.contains('button', 'Create').click({ force: true });\ncy.wait('@createReq');\n// filter row\ncy.get('[data-cy=\"filter-comment\"]').clear().type(comment);\n// EDIT\ncy.get('#app tr:nth-child(1) button.text-primary')\n    .scrollIntoView()\n    .click({ force: true });\nvar newComment = \"\".concat(comment, \"_edited\");\ncy.get('[data-cy=\"crud-comment\"]').clear().type(newComment);\ncy.intercept(['PUT', 'PATCH'], '**/api/**').as('editReq');\ncy.contains('button', 'Save').click({ force: true });\ncy.wait('@editReq').its('response.statusCode').should('be.oneOf', [200, 204]);\n// optional DB verify\ncy.task('queryDB', \"SELECT * FROM venlab.analysis WHERE comment = '\".concat(newComment, \"'\"))\n    .then(function (rows) { return expect(rows.length).to.be.greaterThan(0); });",
               "err": {
-                "message": "AssertionError: Timed out retrying after 6000ms: Expected to find element: `#app a[href=\"/table/analysis\"]`, but never found it.",
-                "estack": "AssertionError: Timed out retrying after 6000ms: Expected to find element: `#app a[href=\"/table/analysis\"]`, but never found it.\n    at Context.eval (webpack://frontend/./cypress/e2e/analysis.cy.ts:45:7)",
+                "message": "CypressError: Timed out retrying after 6000ms: `cy.clear()` failed because it requires a valid clearable element.\n\nThe element cleared was:\n\n  > `<div data-v-284e5fca=\"\" class=\"v-input v-input--horizontal v-input--center-affix v-input--density-comfortable v-theme--dark v-locale--is-ltr v-text-field\" data-cy=\"filter-comment\">...</div>`\n\nA clearable element matches one of the following selectors:\n  'a[href]'\n  'area[href]'\n  'input'\n  'select'\n  'textarea'\n  'button'\n  'iframe'\n  '[tabindex]'\n  '[contenteditable]'\n\nhttps://on.cypress.io/clear",
+                "estack": "CypressError: Timed out retrying after 6000ms: `cy.clear()` failed because it requires a valid clearable element.\n\nThe element cleared was:\n\n  > `<div data-v-284e5fca=\"\" class=\"v-input v-input--horizontal v-input--center-affix v-input--density-comfortable v-theme--dark v-locale--is-ltr v-text-field\" data-cy=\"filter-comment\">...</div>`\n\nA clearable element matches one of the following selectors:\n  'a[href]'\n  'area[href]'\n  'input'\n  'select'\n  'textarea'\n  'button'\n  'iframe'\n  '[tabindex]'\n  '[contenteditable]'\n\nhttps://on.cypress.io/clear\n    at throwError (http://localhost:5173/__cypress/runner/cypress_runner.js:117646:70)\n    at onReady (http://localhost:5173/__cypress/runner/cypress_runner.js:117670:15)\n    at runAllChecks (http://localhost:5173/__cypress/runner/cypress_runner.js:115207:14)\n    at retryActionability (http://localhost:5173/__cypress/runner/cypress_runner.js:115229:16)\n    at tryCatcher (http://localhost:5173/__cypress/runner/cypress_runner.js:1777:23)\n    at Promise.attempt.Promise.try (http://localhost:5173/__cypress/runner/cypress_runner.js:4285:29)\n    at whenStable (http://localhost:5173/__cypress/runner/cypress_runner.js:151493:68)\n    at <unknown> (http://localhost:5173/__cypress/runner/cypress_runner.js:151434:14)\n    at tryCatcher (http://localhost:5173/__cypress/runner/cypress_runner.js:1777:23)\n    at Promise._settlePromiseFromHandler (http://localhost:5173/__cypress/runner/cypress_runner.js:1489:31)\n    at Promise._settlePromise (http://localhost:5173/__cypress/runner/cypress_runner.js:1546:18)\n    at Promise._settlePromise0 (http://localhost:5173/__cypress/runner/cypress_runner.js:1591:10)\n    at Promise._settlePromises (http://localhost:5173/__cypress/runner/cypress_runner.js:1671:18)\n    at Promise._fulfill (http://localhost:5173/__cypress/runner/cypress_runner.js:1615:18)\n    at <unknown> (http://localhost:5173/__cypress/runner/cypress_runner.js:5420:46)",
                 "diff": null
               },
-              "uuid": "b6ce737a-5d96-4cea-af06-1dd77d2ce466",
-              "parentUUID": "7ec87d6d-0aec-4331-b86a-2b578691b082",
+              "uuid": "e4baebac-ebf0-4fa5-ab47-420fe9c4068e",
+              "parentUUID": "64944e44-8022-4ba2-8333-4c3f67ec643f",
               "isHook": false,
               "skipped": false
             }
@@ -82,12 +82,12 @@
           "suites": [],
           "passes": [],
           "failures": [
-            "aa2b9b82-6497-44e2-8fa9-46d090219584",
-            "b6ce737a-5d96-4cea-af06-1dd77d2ce466"
+            "c7c00e7f-c9c2-45ce-8533-d04daa65ac0a",
+            "e4baebac-ebf0-4fa5-ab47-420fe9c4068e"
           ],
           "pending": [],
           "skipped": [],
-          "duration": 15103,
+          "duration": 14501,
           "root": false,
           "rootEmpty": false,
           "_timeout": 2000
