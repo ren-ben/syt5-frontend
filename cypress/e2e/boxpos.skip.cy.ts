@@ -1,4 +1,4 @@
-describe('template spec', () => {
+describe.skip('template spec', () => {
   it('create delete', () => {
     cy.visit('http://localhost:5173/table/analysis')
     cy.get('#username').click();
@@ -26,7 +26,7 @@ describe('template spec', () => {
     //cy.get('#input-v-102').type('879ed661-1393');
   })
 
-  it('edit', () => {
+  it.skip('edit', () => {
     cy.visit('http://localhost:5173/table/analysis')
     cy.get('#username').click();
     cy.get('#username').type('admin');

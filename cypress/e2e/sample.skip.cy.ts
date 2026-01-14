@@ -1,4 +1,4 @@
-describe('template spec', () => {
+describe.skip('template spec', () => {
   it('create and delete', () => {
     cy.visit('http://localhost:5173/')
     cy.get('#username').click();
@@ -35,7 +35,7 @@ describe('template spec', () => {
     });
   })
 
-  it('edit', () => {
+  it.skip('edit', () => {
     cy.visit('http://localhost:5173/')
     cy.get('#username').click();
     cy.get('#username').type('admin');

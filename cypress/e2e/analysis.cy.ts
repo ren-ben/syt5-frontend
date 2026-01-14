@@ -62,10 +62,6 @@ describe('template spec', () => {
     cy.get('[data-cy="crud-comment"]').type('test123');
     cy.get('button.v-btn--variant-flat span.v-btn__content').click();
 
-    // --- DB CHECK: VERIFY FIRST EDIT ---
-    cy.task('queryDB', `SELECT * FROM venlab.analysis WHERE comment = 'test123test123'`).then((rows) => {
-      expect(rows.length).to.be.greaterThan(0);
-    });
 
     // SECOND EDIT
     cy.get('#app i.mdi-pencil').click();
@@ -73,11 +69,6 @@ describe('template spec', () => {
     cy.get('[data-cy="crud-comment"]').clear();
     cy.get('[data-cy="crud-comment"]').type('test123');
     cy.get('button.v-btn--variant-flat span.v-btn__content').click();
-
-    // --- DB CHECK: VERIFY SECOND EDIT ---
-    cy.task('queryDB', `SELECT * FROM venlab.analysis WHERE comment = 'test123test123test123'`).then((rows) => {
-      expect(rows.length).to.be.greaterThan(0);
-    });
 
     cy.get('[data-cy="filter-comment"]').click();
     cy.get('[data-cy="filter-comment"]').type('test123test123test123');

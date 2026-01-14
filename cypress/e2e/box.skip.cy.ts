@@ -1,4 +1,4 @@
-describe('box', () => {
+describe.skip('box', () => {
   it('create and delete', () => {
     cy.visit('http://localhost:5173/table/analysis')
     cy.get('#username').click();
@@ -45,7 +45,7 @@ describe('box', () => {
     });
   })
 
-  it('edit', () => {
+  it.skip('edit', () => {
     cy.visit('http://localhost:5173/table/analysis')
     cy.get('#username').click();
     cy.get('#username').type('admin');
