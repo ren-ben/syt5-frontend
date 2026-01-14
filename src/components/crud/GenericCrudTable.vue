@@ -431,6 +431,7 @@ const filteredHeaders = computed(() => {
                 density="comfortable"
                 hide-details
                 clearable
+                :data-cy="`filter-${h.key}`"
             />
           </v-col>
         </v-row>

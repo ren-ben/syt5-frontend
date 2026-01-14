@@ -24,8 +24,8 @@ describe('template spec', () => {
     });
 
     // DELETE ACTION
-    cy.get('#input-v-135').click();
-    cy.get('#input-v-135').type('1e2e');
+    cy.get('[data-cy="filter-comment"]').click();
+    cy.get('[data-cy="filter-comment"]').type('1e2e');
     cy.get('#app tr:nth-child(1) button.text-error').click();
     cy.get('button.bg-error').click();
 
@@ -44,30 +44,43 @@ describe('template spec', () => {
     cy.get('#app button.submit-btn').click();
     cy.get('#app a[href="/table/analysis"]').click();
 
+    cy.get('#app button.bg-primary').click();
+    cy.get('[data-cy="crud-sId"]').click();
+    cy.get('[data-cy="crud-sId"]').type('879ed661-1393');
+    cy.get('[data-cy="crud-sStamp"]').click();
+    cy.get('[data-cy="crud-sStamp"]').type('2026-01-03T22:48:46');
+    cy.get('[data-cy="crud-comment"]').click();
+    cy.get('[data-cy="crud-comment"]').type('test123');
+    cy.get('button.v-btn--variant-flat span.v-btn__content').click();
+
     // FIRST EDIT
-    cy.get('#input-v-135').click();
-    cy.get('#input-v-135').type('test123');
+    cy.get('[data-cy="filter-comment"]').click();
+    cy.get('[data-cy="filter-comment"]').type('test123');
     cy.get('#app tr:nth-child(1) button.text-primary span.v-btn__content i.mdi').click();
-    cy.get('#input-v-236').click();
-    cy.get('#input-v-236').clear();
-    cy.get('#input-v-236').type('test1234');
+    cy.get('[data-cy="crud-comment"]').click();
+    cy.get('[data-cy="crud-comment"]').clear();
+    cy.get('[data-cy="crud-comment"]').type('test123');
     cy.get('button.v-btn--variant-flat span.v-btn__content').click();
 
     // --- DB CHECK: VERIFY FIRST EDIT ---
-    cy.task('queryDB', `SELECT * FROM venlab.analysis WHERE comment = 'test1234'`).then((rows) => {
+    cy.task('queryDB', `SELECT * FROM venlab.analysis WHERE comment = 'test123test123'`).then((rows) => {
       expect(rows.length).to.be.greaterThan(0);
     });
 
     // SECOND EDIT
     cy.get('#app i.mdi-pencil').click();
-    cy.get('#input-v-280').click();
-    cy.get('#input-v-280').clear();
-    cy.get('#input-v-280').type('test123');
+    cy.get('[data-cy="crud-comment"]').click();
+    cy.get('[data-cy="crud-comment"]').clear();
+    cy.get('[data-cy="crud-comment"]').type('test123');
     cy.get('button.v-btn--variant-flat span.v-btn__content').click();
 
     // --- DB CHECK: VERIFY SECOND EDIT ---
-    cy.task('queryDB', `SELECT * FROM venlab.analysis WHERE comment = 'test123'`).then((rows) => {
+    cy.task('queryDB', `SELECT * FROM venlab.analysis WHERE comment = 'test123test123test123'`).then((rows) => {
       expect(rows.length).to.be.greaterThan(0);
     });
+
+    cy.get('[data-cy="filter-comment"]').click();
+    cy.get('[data-cy="filter-comment"]').type('test123test123test123');
+
   })
 })
