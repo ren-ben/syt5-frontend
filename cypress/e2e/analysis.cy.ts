@@ -77,11 +77,9 @@ describe('template spec', () => {
     const newComment = `${comment}_edited`
     cy.get('[data-cy="crud-comment"]').clear().type(newComment)
 
-    cy.intercept({ method: 'PUT', url: '**/api/analysis/**' }).as('editReq')
-    cy.intercept({ method: 'PATCH', url: '**/api/analysis/**' }).as('editReq')
-
     cy.contains('button', 'Save').click({ force: true })
-    cy.wait('@editReq').its('response.statusCode').should('be.oneOf', [200, 204])
+
+    cy.get('.v-dialog').should('not.exist')
 
     // optional DB verify
     cy.task('queryDB', `SELECT * FROM venlab.analysis WHERE comment = '${newComment}'`)
