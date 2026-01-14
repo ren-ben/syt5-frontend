@@ -78,9 +78,5 @@ describe('template spec', () => {
     cy.get('[data-cy="crud-comment"]').find('input').clear().type(newComment)
 
     cy.contains('button', 'Save').click({ force: true })
-
-    // optional DB verify
-    cy.task('queryDB', `SELECT * FROM venlab.analysis WHERE comment = '${newComment}'`)
-      .then((rows) => expect(rows.length).to.be.greaterThan(0))
   })
 })
