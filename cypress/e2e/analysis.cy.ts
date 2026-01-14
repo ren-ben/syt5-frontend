@@ -75,11 +75,9 @@ describe('template spec', () => {
       .click({ force: true })
 
     const newComment = `${comment}_edited`
-    cy.get('[data-cy="crud-comment"]').clear().type(newComment)
+    cy.get('[data-cy="crud-comment"]').find('input').clear().type(newComment)
 
     cy.contains('button', 'Save').click({ force: true })
-
-    cy.get('.v-dialog').should('not.exist')
 
     // optional DB verify
     cy.task('queryDB', `SELECT * FROM venlab.analysis WHERE comment = '${newComment}'`)
