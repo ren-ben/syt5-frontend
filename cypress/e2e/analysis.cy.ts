@@ -10,12 +10,12 @@ describe('template spec', () => {
 
     // CREATE ACTION
     cy.get('#app button.bg-primary').click();
-    cy.get('#input-v-197').click();
-    cy.get('#input-v-197').type('879ed661-1393');
-    cy.get('#input-v-200').click();
-    cy.get('#input-v-200').type('2026-01-03T22:48:46');
-    cy.get('#input-v-233').click();
-    cy.get('#input-v-233').type('1e2e');
+    cy.get('[data-cy="crud-sId"]').click();
+    cy.get('[data-cy="crud-sId"]').type('879ed661-1393');
+    cy.get('[data-cy="crud-sStamp"]').click();
+    cy.get('[data-cy="crud-sStamp"]').type('2026-01-03T22:48:46');
+    cy.get('[data-cy="crud-comment"]').click();
+    cy.get('[data-cy="crud-comment"]').type('1e2e');
     cy.get('button.v-btn--variant-flat span.v-btn__content').click();
 
     // --- DB CHECK: VERIFY CREATE ---

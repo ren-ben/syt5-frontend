@@ -81,6 +81,7 @@ function onCancel() {
               :label="field"
               variant="outlined"
               :readonly="props.readonlyKeys?.includes(field)"
+              :data-cy="`crud-${field}`"
             />
           </v-col>
         </v-row>
