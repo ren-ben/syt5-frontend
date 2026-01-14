@@ -1,34 +1,32 @@
 import { defineConfig } from "cypress";
-import pg from "pg"; // Import the pg client
+import pg from "pg";
 
 export default defineConfig({
-  reporter: 'cypress-mochawesome-reporter',
+  reporter: "cypress-mochawesome-reporter",
   experimentalStudio: true,
   video: true,
+
   e2e: {
     specPattern: "cypress/e2e/*.cy.ts",
-    baseUrl: 'http://localhost:5173',
-    setupNodeEvents(on, config) {
-      require('cypress-mochawesome-reporter/plugin')(on);
+    baseUrl: "http://localhost:5173",
 
-      // Define the database query task
+    setupNodeEvents(on, config) {
+      require("cypress-mochawesome-reporter/plugin")(on);
+
       on("task", {
         async queryDB(query) {
-          // Create a new client with your credentials
           const client = new pg.Client({
-            user: "postgres",
-            password: "Partly3More6annual",
-            host: "localhost",
-            database: "venlab",
-            port: 5432,
+            user: config.env.DB_USER || "postgres",
+            password: config.env.DB_PASSWORD || "postgres",
+            host: config.env.DB_HOST || "localhost",
+            database: config.env.DB_NAME || "venlab",
+            port: Number(config.env.DB_PORT || 5432),
           });
 
           await client.connect();
           try {
             const res = await client.query(query);
-            return res.rows; // Return the rows for validation
-          } catch (error) {
-            throw error;
+            return res.rows;
           } finally {
             await client.end();
           }
@@ -37,6 +35,7 @@ export default defineConfig({
 
       return config;
     },
+
     defaultCommandTimeout: 6000,
   },
 });
