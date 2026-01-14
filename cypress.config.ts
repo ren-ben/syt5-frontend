@@ -6,7 +6,7 @@ export default defineConfig({
   experimentalStudio: true,
   video: true,
   e2e: {
-    specPattern: "cypress/e2e/*.cy.js",
+    specPattern: "cypress/e2e/*.cy.ts",
     baseUrl: 'http://localhost:5173',
     setupNodeEvents(on, config) {
       require('cypress-mochawesome-reporter/plugin')(on);
