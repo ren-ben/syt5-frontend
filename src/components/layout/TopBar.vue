@@ -14,28 +14,28 @@
         <div class="d-flex align-center" style="gap: 12px">
           <v-text-field
             v-model="tempDateFrom"
-            type="datetime-local"
-            label="Start Date (DateIn)"
+            type="date" 
+            label="Start Date"
             variant="outlined"
             density="compact"
             hide-details
             bg-color="surface"
             class="date-input"
-            style="min-width: 200px"
+            style="min-width: 160px"
           />
           
           <v-icon icon="mdi-arrow-right" size="small" color="medium-emphasis" />
           
           <v-text-field
             v-model="tempDateTo"
-            type="datetime-local"
-            label="End Date (DateIn)"
+            type="date" 
+            label="End Date"
             variant="outlined"
             density="compact"
             hide-details
             bg-color="surface"
             class="date-input"
-            style="min-width: 200px"
+            style="min-width: 160px"
           />
         </div>
 
