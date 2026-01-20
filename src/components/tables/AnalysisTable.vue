@@ -96,6 +96,8 @@ async function validateForm(form: any) {
         :deleteFn="deleteAnalysis"
         :getId="row => row.aId"
         :validateForm="validateForm"
+        :show-export="true"
     />
   </v-container>
 </template>
+

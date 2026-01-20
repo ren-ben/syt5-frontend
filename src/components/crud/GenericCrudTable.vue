@@ -15,9 +15,9 @@ const props = defineProps<{
   deleteFn: (id: any, row?: any) => Promise<any>;
   keyMap?: Record<string, string>;
   validateForm?: (form: any) => Promise<{ ok: boolean; message?: string }>;
-  storageKey?: string; 
+  storageKey?: string;
+  showExport?: boolean; // NEW PROP
 }>();
-
 
 const isSampleTable = computed(() => props.apiPath.includes("/samples"));
 
@@ -79,6 +79,10 @@ const errorDialog = reactive({
   message: ''
 });
 
+// Export State
+const exportLoading = ref(false);
+const snackbar = ref({ show: false, message: '', color: '' });
+
 function showError(message: string) {
   errorDialog.message = message;
   errorDialog.visible = true;
@@ -101,7 +105,6 @@ onMounted(() => {
     }
   }
 });
-
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", recalcItemsPerPage);
@@ -156,7 +159,6 @@ async function load() {
 
       return {
         ...a,
-
         // ===== Normalize ID naming across all tables =====
         bId: (
             a.bId ??
@@ -167,10 +169,8 @@ async function load() {
             a.BID ??
             null
         ),
-
         // ===== normalize BoxPos ID =====
         bposId: a.bposId ?? id.bposId ?? null,
-
         // ===== normalize Sample foreign keys =====
         sId: (
             a.sId ??
@@ -186,10 +186,8 @@ async function load() {
             a.sample?.s_stamp ??
             null
         ),
-
         // ===== Date normalization =====
         dateExported: a.dateExported ?? a.date_exported ?? null,
-
         id // keep raw but never display directly
       };
     }
@@ -236,7 +234,6 @@ function openEdit(item: any) {
   dialog.value = { visible: true, mode: "edit", form: { ...item } };
 }
 
-// FIXED SAVE FUNCTION WITH VALIDATION
 async function save(payload?: any) {
   const mode = dialog.value.mode;
   const form = payload ?? dialog.value.form;
@@ -296,7 +293,6 @@ async function remove() {
     load();
   } catch (err: any) {
     console.warn("Delete failed:", err);
-
     const status = err.response?.status;
 
     if (
@@ -395,12 +391,91 @@ watch(visibleColumns, (newValue) => {
 const filteredHeaders = computed(() => {
   return props.headers.filter(h => visibleColumns.value.includes(h.key));
 });
+// ... inside script setup ...
+
+// REMOVE THIS LINE:
+// import { useAxios } from "@/composables/useAxios"; 
+
+async function exportToCSV() {
+  exportLoading.value = true;
+  try {
+    const params = new URLSearchParams();
+    
+    // Add pagination
+    params.append('page', '0');
+    params.append('size', String(Math.max(total.value, 10000))); 
+    
+    // Add filters
+    Object.entries(filters.value).forEach(([key, value]) => {
+      if (value) {
+        params.append(`filter[${mapKey(key)}]`, String(value));
+      }
+    });
+    
+    // Add sort
+    if (sortBy.value.length > 0) {
+      const sort = sortBy.value[0];
+      params.append(`sort[${mapKey(sort.key)}]`, sort.order);
+    }
+    
+    // FIX: Use 'http' directly instead of useAxios()
+    const response = await http.get(`${props.apiPath}/export/csv?${params}`, {
+      responseType: 'blob'
+    });
+    
+    // Create download link
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    
+    // Filename logic
+    const contentDisposition = response.headers['content-disposition'];
+    let filename = `${props.apiPath.replace('/', '')}_export.csv`;
+    if (contentDisposition) {
+        const matches = /filename="?([^"]+)"?/.exec(contentDisposition);
+        if (matches && matches[1]) filename = matches[1];
+    }
+    
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+    
+    snackbar.value = { show: true, message: 'Export successful', color: 'success' };
+  } catch (error: any) {
+    console.error("Export failed", error);
+    snackbar.value = { 
+        show: true, 
+        message: error.response?.data?.message || 'Export failed', 
+        color: 'error' 
+    };
+  } finally {
+    exportLoading.value = false;
+  }
+}
 
 </script>
+
 <template>
   <v-card flat>
     <v-toolbar flat density="compact" color="transparent">
       <v-spacer />
+      
+      <!-- Export Button -->
+      <v-btn 
+        v-if="showExport"
+        icon
+        variant="text" 
+        :loading="exportLoading"
+        @click="exportToCSV"
+        class="mr-2"
+        color="primary"
+      >
+        <v-icon>mdi-download</v-icon>
+        <v-tooltip activator="parent" location="bottom">Export CSV</v-tooltip>
+      </v-btn>
+
       <ColumnSelector
         :headers="props.headers"
         v-model="visibleColumns"
@@ -449,7 +524,7 @@ const filteredHeaders = computed(() => {
       </template>
     </v-data-table-server>
 
-    <!-- Rest of your dialogs remain the same -->
+    <!-- Dialogs -->
     <CrudDialog
         v-model:visible="dialog.visible"
         :mode="dialog.mode"
@@ -496,6 +571,14 @@ const filteredHeaders = computed(() => {
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Snackbar for Export Status -->
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+        {{ snackbar.message }}
+        <template v-slot:actions>
+            <v-btn variant="text" @click="snackbar.show = false">Close</v-btn>
+        </template>
+    </v-snackbar>
   </v-card>
 </template>
 
