@@ -4,6 +4,8 @@ import { http } from "@/services/http";
 import CrudDialog from "./CrudDialog.vue";
 import DeleteChoiceDialog from "./DeleteChoiceDialog.vue";
 import ColumnSelector from "@/components/tables/ColumnSelector.vue";
+import { useGlobalFilter } from '@/composables/useGlobalFilter';
+
 
 const props = defineProps<{
   apiPath: string;
@@ -83,6 +85,8 @@ const errorDialog = reactive({
 const exportLoading = ref(false);
 const snackbar = ref({ show: false, message: '', color: '' });
 
+const { dateFrom, dateTo } = useGlobalFilter();
+
 function showError(message: string) {
   errorDialog.message = message;
   errorDialog.visible = true;
@@ -146,13 +150,15 @@ async function load() {
     const mappedSort = { [mapKey(sort.key)]: sort.order };
 
     const { data } = await http.get(props.apiPath, {
-      params: {
-        page: page.value - 1,
-        size: itemsPerPage.value,
-        filter: mappedFilters,
-        sort: mappedSort,
-      },
-    });
+        params: {
+          page: page.value - 1,
+          size: itemsPerPage.value,
+          filter: mappedFilters,
+          sort: mappedSort,
+          dateFrom: dateFrom.value || undefined,
+          dateTo: dateTo.value || undefined
+        },
+      });
 
     function normalizeRow(a: any) {
       const id = a.id ?? {};
@@ -405,6 +411,9 @@ async function exportToCSV() {
 
     params.append('page', String(currentPageIndex));
     params.append('size', String(currentSize));
+
+    if (dateFrom.value) params.append('dateFrom', dateFrom.value);
+    if (dateTo.value) params.append('dateTo', dateTo.value);
     
     // Add current filters
     Object.entries(filters.value).forEach(([key, value]) => {
