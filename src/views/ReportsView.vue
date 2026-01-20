@@ -87,7 +87,7 @@
           <v-col cols="12" md="9">
              <v-card border elevation="0" min-height="600" class="d-flex flex-column">
                <!-- Result Header -->
-               <div class="d-flex align-center px-4 py-3 border-b bg-grey-lighten-5">
+               <div class="d-flex align-center px-4 py-3 border-b">
                  <v-icon :icon="selectedAnalysis?.icon" color="primary" class="mr-3" />
                  <div>
                     <h2 class="text-subtitle-1 font-weight-bold">{{ selectedAnalysis?.title || 'Select Analysis' }}</h2>
