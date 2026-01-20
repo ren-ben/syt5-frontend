@@ -397,8 +397,14 @@ async function exportToCSV() {
   try {
     const params = new URLSearchParams();
     
-    params.append('page', String(page.value - 1));
-    params.append('size', String(itemsPerPage.value));
+    const currentPageIndex = page.value > 0 ? page.value - 1 : 0;
+    
+    const currentSize = itemsPerPage.value;
+
+    console.log(`Exporting Page: ${currentPageIndex}, Size: ${currentSize}`); // Debug log
+
+    params.append('page', String(currentPageIndex));
+    params.append('size', String(currentSize));
     
     // Add current filters
     Object.entries(filters.value).forEach(([key, value]) => {
@@ -414,8 +420,10 @@ async function exportToCSV() {
     }
     
     // Make request
+    // We keep a reasonable timeout (30s) because fetching 25 rows should be instant.
     const response = await http.get(`${props.apiPath}/export/csv?${params}`, {
-      responseType: 'blob'
+      responseType: 'blob',
+      timeout: 30000 // 30 seconds
     });
     
     // Create download link
@@ -423,9 +431,8 @@ async function exportToCSV() {
     const link = document.createElement('a');
     link.href = url;
     
-    // Filename logic
     const contentDisposition = response.headers['content-disposition'];
-    let filename = `${props.apiPath.replace('/', '')}_export_p${page.value}.csv`; // Appended page number
+    let filename = `${props.apiPath.replace('/', '')}_export_p${page.value}.csv`;
     if (contentDisposition) {
         const matches = /filename="?([^"]+)"?/.exec(contentDisposition);
         if (matches && matches[1]) filename = matches[1];
@@ -449,6 +456,7 @@ async function exportToCSV() {
     exportLoading.value = false;
   }
 }
+
 
 
 </script>
