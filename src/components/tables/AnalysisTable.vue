@@ -18,6 +18,7 @@ const headers = [
   { key: 'dateOut', title: 'Date Out' },
   { key: 'boxposString', title: 'Box Position' },
   { key: 'comment', title: 'Comment' },
+  { key: 'aflags', title: 'Flags' },
 ];
 
 const tableRef = ref<any>(null);

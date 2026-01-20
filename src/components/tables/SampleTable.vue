@@ -11,6 +11,7 @@ const headers = [
   { key: 'lane', title: 'Lane' },
   { key: 'boxposString', title: 'Box Position' },
   { key: 'comment', title: 'Comment' },
+  { key: 'sFlags', title: 'Flags' },
 ];
 
 const tableRef = ref<any>(null);
