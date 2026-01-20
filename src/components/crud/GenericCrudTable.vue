@@ -219,6 +219,12 @@ const readonlyKeys = computed(() => {
 
 watch([page, itemsPerPage, sortBy, filters], load, { deep: true, immediate: true });
 
+watch([dateFrom, dateTo], () => {
+  console.log("Global filter changed:", dateFrom.value, dateTo.value);
+  page.value = 1;
+  load();
+});
+
 // ========== CRUD Actions ==========
 function openCreate(defaults?: Record<string, any>) {
   dialog.value.mode = "create";
