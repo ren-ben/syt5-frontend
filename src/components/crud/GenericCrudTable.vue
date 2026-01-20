@@ -391,34 +391,29 @@ watch(visibleColumns, (newValue) => {
 const filteredHeaders = computed(() => {
   return props.headers.filter(h => visibleColumns.value.includes(h.key));
 });
-// ... inside script setup ...
-
-// REMOVE THIS LINE:
-// import { useAxios } from "@/composables/useAxios"; 
 
 async function exportToCSV() {
   exportLoading.value = true;
   try {
     const params = new URLSearchParams();
     
-    // Add pagination
-    params.append('page', '0');
-    params.append('size', String(Math.max(total.value, 10000))); 
+    params.append('page', String(page.value - 1));
+    params.append('size', String(itemsPerPage.value));
     
-    // Add filters
+    // Add current filters
     Object.entries(filters.value).forEach(([key, value]) => {
       if (value) {
         params.append(`filter[${mapKey(key)}]`, String(value));
       }
     });
     
-    // Add sort
+    // Add current sort
     if (sortBy.value.length > 0) {
       const sort = sortBy.value[0];
       params.append(`sort[${mapKey(sort.key)}]`, sort.order);
     }
     
-    // FIX: Use 'http' directly instead of useAxios()
+    // Make request
     const response = await http.get(`${props.apiPath}/export/csv?${params}`, {
       responseType: 'blob'
     });
@@ -430,7 +425,7 @@ async function exportToCSV() {
     
     // Filename logic
     const contentDisposition = response.headers['content-disposition'];
-    let filename = `${props.apiPath.replace('/', '')}_export.csv`;
+    let filename = `${props.apiPath.replace('/', '')}_export_p${page.value}.csv`; // Appended page number
     if (contentDisposition) {
         const matches = /filename="?([^"]+)"?/.exec(contentDisposition);
         if (matches && matches[1]) filename = matches[1];
@@ -454,6 +449,7 @@ async function exportToCSV() {
     exportLoading.value = false;
   }
 }
+
 
 </script>
 
