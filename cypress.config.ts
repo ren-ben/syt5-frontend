@@ -35,7 +35,8 @@ export default defineConfig({
 
       return config;
     },
-
+    downloadsFolder: 'cypress/downloads',
+    modifyObstructiveCode: false,  
     defaultCommandTimeout: 6000,
   },
 });
