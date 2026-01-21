@@ -16,7 +16,7 @@ describe('template spec', () => {
     // ✅ wait for analysis table to actually be mounted
     cy.get('#app a[href="/table/analysis"]', { timeout: 20000 }).should('exist') // nav exists
     cy.get('[data-cy="filter-comment"]', { timeout: 20000 }).should('be.visible') // analysis-only filter
-    cy.get('#app button.bg-primary', { timeout: 20000 }).should('be.visible') // create button
+    cy.get('[data-cy="crud-sidebar-add-button"]', { timeout: 20000 }).should('be.visible') // create button
   }
 
   it('create and delete', () => {
@@ -24,7 +24,7 @@ describe('template spec', () => {
     loginAndOpenAnalysis()
 
     // CREATE ACTION (analysis)
-    cy.get('#app button.bg-primary').click()
+    cy.get('[data-cy="crud-sidebar-add-button"]').click()
 
     cy.get('.v-dialog', { timeout: 20000 }).should('be.visible')
     cy.get('[data-cy="crud-sId"]', { timeout: 20000 }).should('be.visible').type('879ed661-1393')
@@ -56,7 +56,7 @@ describe('template spec', () => {
     loginAndOpenAnalysis()
 
     // create row to edit
-    cy.get('#app button.bg-primary').click()
+    cy.get('[data-cy="crud-sidebar-add-button"]').click()
     cy.get('.v-dialog', { timeout: 20000 }).should('be.visible')
     cy.get('[data-cy="crud-sId"]').type('879ed661-1393')
     cy.get('[data-cy="crud-sStamp"]').type('2026-01-03T22:48:46')

@@ -1,0 +1,132 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 2,
+    "passes": 0,
+    "pending": 0,
+    "failures": 2,
+    "start": "2026-01-20T21:41:55.749Z",
+    "end": "2026-01-20T21:42:05.718Z",
+    "duration": 9969,
+    "testsRegistered": 2,
+    "passPercent": 0,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "3907bec7-2d7a-4ae8-a835-4837bff91a4e",
+      "title": "",
+      "fullFile": "cypress\\e2e\\analysis.cy.ts",
+      "file": "cypress\\e2e\\analysis.cy.ts",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "e6827023-5975-41b0-a6a6-987e069bab22",
+          "title": "template spec",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "create and delete",
+              "fullTitle": "template spec create and delete",
+              "timedOut": null,
+              "duration": 5744,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "var comment = \"e2e_\".concat(Date.now());\nloginAndOpenAnalysis();\n// CREATE ACTION (analysis)\ncy.get('#app button.bg-primary').click();\ncy.get('.v-dialog', { timeout: 20000 }).should('be.visible');\ncy.get('[data-cy=\"crud-sId\"]', { timeout: 20000 }).should('be.visible').type('879ed661-1393');\ncy.get('[data-cy=\"crud-sStamp\"]').type('2026-01-03T22:48:46');\ncy.get('[data-cy=\"crud-comment\"]').type(comment);\ncy.intercept('POST', '**/api/**').as('createReq');\ncy.contains('button', 'Create').click({ force: true }); // more stable than deep selector\ncy.wait('@createReq').its('response.statusCode').should('be.oneOf', [200, 201]);\ncy.task('queryDB', \"SELECT * FROM venlab.analysis WHERE comment = '\".concat(comment, \"'\"))\n    .then(function (rows) { return expect(rows).to.have.length(1); });\n// DELETE\ncy.get('[data-cy=\"filter-comment\"]').find('input').clear().type(comment);\n// intercept BEFORE confirm click\ncy.intercept('DELETE', '**/api/**').as('deleteReq');\ncy.get('#app tr:nth-child(1) button.text-error').scrollIntoView().click({ force: true });\ncy.contains('button', 'Delete').click({ force: true });\ncy.wait('@deleteReq').its('response.statusCode').should('be.oneOf', [200, 204]);\ncy.task('queryDB', \"SELECT * FROM venlab.analysis WHERE comment = '\".concat(comment, \"'\"))\n    .then(function (rows) { return expect(rows).to.have.length(0); });",
+              "err": {
+                "message": "CypressError: `cy.click()` can only be called on a single element. Your subject contained 2 elements. Pass `{ multiple: true }` if you want to serially click each element.\n\nhttps://on.cypress.io/click",
+                "estack": "CypressError: `cy.click()` can only be called on a single element. Your subject contained 2 elements. Pass `{ multiple: true }` if you want to serially click each element.\n\nhttps://on.cypress.io/click\n    at mouseAction (http://localhost:5173/__cypress/runner/cypress_runner.js:114398:68)\n    at Context.click (http://localhost:5173/__cypress/runner/cypress_runner.js:114565:14)\n    at wrapped (http://localhost:5173/__cypress/runner/cypress_runner.js:145818:19)\n    at <unknown> (http://localhost:5173/__cypress/runner/cypress_runner.js:151765:15)\n    at tryCatcher (http://localhost:5173/__cypress/runner/cypress_runner.js:1777:23)\n    at Promise._settlePromiseFromHandler (http://localhost:5173/__cypress/runner/cypress_runner.js:1489:31)\n    at Promise._settlePromise (http://localhost:5173/__cypress/runner/cypress_runner.js:1546:18)\n    at Promise._settlePromiseCtx (http://localhost:5173/__cypress/runner/cypress_runner.js:1583:10)\n    at _drainQueueStep (http://localhost:5173/__cypress/runner/cypress_runner.js:2381:12)\n    at _drainQueue (http://localhost:5173/__cypress/runner/cypress_runner.js:2370:9)\n    at Async._drainQueues (http://localhost:5173/__cypress/runner/cypress_runner.js:2386:5)\n    at Async.drainQueues (http://localhost:5173/__cypress/runner/cypress_runner.js:2256:14)",
+                "diff": null
+              },
+              "uuid": "eb3c71b0-bccd-4f5c-a0a8-36bb55c907b3",
+              "parentUUID": "e6827023-5975-41b0-a6a6-987e069bab22",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "edit",
+              "fullTitle": "template spec edit",
+              "timedOut": null,
+              "duration": 4085,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "var comment = \"edit_\".concat(Date.now());\nloginAndOpenAnalysis();\n// create row to edit\ncy.get('#app button.bg-primary').click();\ncy.get('.v-dialog', { timeout: 20000 }).should('be.visible');\ncy.get('[data-cy=\"crud-sId\"]').type('879ed661-1393');\ncy.get('[data-cy=\"crud-sStamp\"]').type('2026-01-03T22:48:46');\ncy.get('[data-cy=\"crud-comment\"]').type(comment);\ncy.intercept('POST', '**/api/**').as('createReq');\ncy.contains('button', 'Create').click({ force: true });\ncy.wait('@createReq');\n// filter row\ncy.get('[data-cy=\"filter-comment\"]').find('input').clear().type(comment);\n// EDIT\ncy.get('#app tr:nth-child(1) button.text-primary')\n    .scrollIntoView()\n    .click({ force: true });\nvar newComment = \"\".concat(comment, \"_edited\");\ncy.get('[data-cy=\"crud-comment\"]').find('input').clear().type(newComment);\ncy.contains('button', 'Save').click({ force: true });",
+              "err": {
+                "message": "CypressError: `cy.click()` can only be called on a single element. Your subject contained 2 elements. Pass `{ multiple: true }` if you want to serially click each element.\n\nhttps://on.cypress.io/click",
+                "estack": "CypressError: `cy.click()` can only be called on a single element. Your subject contained 2 elements. Pass `{ multiple: true }` if you want to serially click each element.\n\nhttps://on.cypress.io/click\n    at mouseAction (http://localhost:5173/__cypress/runner/cypress_runner.js:114398:68)\n    at Context.click (http://localhost:5173/__cypress/runner/cypress_runner.js:114565:14)\n    at wrapped (http://localhost:5173/__cypress/runner/cypress_runner.js:145818:19)\n    at <unknown> (http://localhost:5173/__cypress/runner/cypress_runner.js:151765:15)\n    at tryCatcher (http://localhost:5173/__cypress/runner/cypress_runner.js:1777:23)\n    at Promise._settlePromiseFromHandler (http://localhost:5173/__cypress/runner/cypress_runner.js:1489:31)\n    at Promise._settlePromise (http://localhost:5173/__cypress/runner/cypress_runner.js:1546:18)\n    at Promise._settlePromiseCtx (http://localhost:5173/__cypress/runner/cypress_runner.js:1583:10)\n    at _drainQueueStep (http://localhost:5173/__cypress/runner/cypress_runner.js:2381:12)\n    at _drainQueue (http://localhost:5173/__cypress/runner/cypress_runner.js:2370:9)\n    at Async._drainQueues (http://localhost:5173/__cypress/runner/cypress_runner.js:2386:5)\n    at Async.drainQueues (http://localhost:5173/__cypress/runner/cypress_runner.js:2256:14)",
+                "diff": null
+              },
+              "uuid": "006b9119-0b1b-499d-ac57-48e6a7ca04a8",
+              "parentUUID": "e6827023-5975-41b0-a6a6-987e069bab22",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [],
+          "failures": [
+            "eb3c71b0-bccd-4f5c-a0a8-36bb55c907b3",
+            "006b9119-0b1b-499d-ac57-48e6a7ca04a8"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 9829,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.2.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.4"
+    },
+    "marge": {
+      "options": {
+        "overwrite": false,
+        "html": false,
+        "json": true,
+        "reportDir": "cypress\\reports\\html\\.jsons"
+      },
+      "version": "6.3.2"
+    }
+  }
+}

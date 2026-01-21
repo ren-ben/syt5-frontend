@@ -17,7 +17,7 @@ export default defineConfig({
         async queryDB(query) {
           const client = new pg.Client({
             user: config.env.DB_USER || "postgres",
-            password: config.env.DB_PASSWORD || "postgres",
+            password: config.env.DB_PASSWORD || "Partly3More6annual",
             host: config.env.DB_HOST || "localhost",
             database: config.env.DB_NAME || "venlab",
             port: Number(config.env.DB_PORT || 5432),

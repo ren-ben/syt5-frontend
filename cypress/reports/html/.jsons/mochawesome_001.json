@@ -1,0 +1,124 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 1,
+    "passes": 0,
+    "pending": 2,
+    "failures": -1,
+    "start": "2026-01-20T21:42:08.302Z",
+    "end": "2026-01-20T21:42:08.306Z",
+    "duration": 4,
+    "testsRegistered": 2,
+    "passPercent": null,
+    "pendingPercent": 100,
+    "other": 1,
+    "hasOther": true,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "1b2ef041-413b-4616-b049-fb2b7ccf4a33",
+      "title": "",
+      "fullFile": "cypress\\e2e\\box.skip.cy.ts",
+      "file": "cypress\\e2e\\box.skip.cy.ts",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "c8738e11-9020-4ed5-95ef-3b3b1bad8a20",
+          "title": "box",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "create and delete",
+              "fullTitle": "box create and delete",
+              "timedOut": null,
+              "duration": 0,
+              "state": "pending",
+              "speed": null,
+              "pass": false,
+              "fail": false,
+              "pending": true,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/table/analysis');\ncy.get('#username').click();\ncy.get('#username').type('admin');\ncy.get('#password').click();\ncy.get('#password').type('admin123');\ncy.get('#app button.submit-btn').click();\n// Navigate to Box table\ncy.get('#app a[href=\"/table/box\"] div.v-list-item-title').click();\n// CREATE ACTION\ncy.get('#app button.bg-primary').click();\n// Input Box Name (Assuming input-v-173 is Name/ID)\ncy.get('#input-v-173').click();\ncy.get('#input-v-173').clear();\ncy.get('#input-v-173').type('B999');\n// Input Comment (Assuming input-v-176 is Comment)\ncy.get('#input-v-176').click();\ncy.get('#input-v-176').clear();\ncy.get('#input-v-176').type('test999');\ncy.get('button.v-btn--variant-flat span.v-btn__content').click();\n// --- DB CHECK: VERIFY CREATE ---\n// Verifies that a box with name 'B999' and comment 'test999' exists\ncy.task('queryDB', \"SELECT * FROM venlab.box WHERE b_id = 'B999'\").then(function (rows) {\n    expect(rows).to.have.length(1);\n    expect(rows[0].name).to.equal('test999'); // Optional: check specific field content\n});\n// DELETE ACTION\ncy.get('#input-v-96').click();\ncy.get('#input-v-96').type('B999'); // Search for the box\ncy.get('#app i.mdi-delete').click();\ncy.get('button.bg-error span.v-btn__content').click();\n// --- DB CHECK: VERIFY DELETE ---\n// Verifies the box is gone\ncy.task('queryDB', \"SELECT * FROM venlab.box WHERE b_id = 'B999'\").then(function (rows) {\n    expect(rows).to.have.length(0);\n});",
+              "err": {},
+              "uuid": "db67c9bc-3af3-42b0-a986-994a2ff16a1c",
+              "parentUUID": "c8738e11-9020-4ed5-95ef-3b3b1bad8a20",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "edit",
+              "fullTitle": "box edit",
+              "timedOut": null,
+              "duration": 0,
+              "state": "pending",
+              "speed": null,
+              "pass": false,
+              "fail": false,
+              "pending": true,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/table/analysis');\ncy.get('#username').click();\ncy.get('#username').type('admin');\ncy.get('#password').click();\ncy.get('#password').type('admin123');\ncy.get('#app button.submit-btn').click();\ncy.get('#app a[href=\"/table/box\"] div.v-list-item-title').click();\ncy.get('#app th.v-data-table__th--sorted span').click();\ncy.get('#input-v-99').click();\ncy.get('#input-v-96').click();\ncy.get('#input-v-96').type('B000');\ncy.get('#app button.text-primary').click();\ncy.get('#input-v-176').click();\ncy.get('#input-v-176').clear();\ncy.get('#input-v-176').type('test000123');\ncy.get('div.v-card-actions').click();\ncy.get('button.v-btn--variant-flat').click();\ncy.get('#app button.text-primary').click();\ncy.task('queryDB', \"SELECT * FROM venlab.box WHERE name LIKE 'test000123'\").then(function (rows) {\n    expect(rows.length).to.be.greaterThan(0);\n});\ncy.get('#input-v-196').click();\ncy.get('#input-v-196').clear();\ncy.get('#input-v-196').type('test000');\ncy.get('button.v-btn--variant-flat span.v-btn__content').click();\ncy.task('queryDB', \"SELECT * FROM venlab.box WHERE name LIKE 'test000'\").then(function (rows) {\n    expect(rows.length).to.be.greaterThan(0);\n});",
+              "err": {},
+              "uuid": "99ea5f85-9e3f-411e-8676-2c00b505522d",
+              "parentUUID": "c8738e11-9020-4ed5-95ef-3b3b1bad8a20",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [],
+          "failures": [],
+          "pending": [
+            "db67c9bc-3af3-42b0-a986-994a2ff16a1c",
+            "99ea5f85-9e3f-411e-8676-2c00b505522d"
+          ],
+          "skipped": [],
+          "duration": 0,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.2.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.4"
+    },
+    "marge": {
+      "options": {
+        "overwrite": false,
+        "html": false,
+        "json": true,
+        "reportDir": "cypress\\reports\\html\\.jsons"
+      },
+      "version": "6.3.2"
+    }
+  }
+}

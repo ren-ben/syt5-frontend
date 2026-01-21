@@ -28,6 +28,7 @@ onMounted(() => {
       elevation="8"
       style="backdrop-filter: blur(12px);"
       @click="emit('create')"
+      :data-cy="`crud-sidebar-add-button`"
     />
   </div>
 </template>

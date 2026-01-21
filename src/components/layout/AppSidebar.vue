@@ -53,6 +53,7 @@
         size="large"
         class="sidebar-create-btn"
         @click="$emit('create')"
+        :data-cy="`crud-sidebar-add-button`"
       />
     </div>
   </v-navigation-drawer>
